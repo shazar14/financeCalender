@@ -1,4 +1,20 @@
 $(document).ready(function() {
+	      parameters = JSON.stringify({request:'queryAll'});
+
+	      $.ajax({
+		url: 'cgi-bin/command.py',
+		type: 'POST',
+		data: parameters,
+		dataType: 'text',
+		error: function(jqXHR, error, errorThrown){
+		    alert("ERROR:" + jqXHR.responseText);
+		},
+		success: function(data){ //data is in custom JSON object.  See database_transactions.py for definition
+		
+
+		}
+	      });
+
 		var date = new Date();
 		var d = date.getDate();
 		var m = date.getMonth();

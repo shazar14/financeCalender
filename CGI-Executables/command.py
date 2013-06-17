@@ -19,3 +19,9 @@ except ValueError:
 
 if(jsonData['request'] == 'queryAll'):
 	jsonResults = db_interact.get_all_bills()
+
+try:
+  result = json.loads(jsonResults)
+except ValueError:
+  log.log_error("Error converting jsonResults: '%s' to jsonData\n\n" %jsonResults)
+  sys.exit()
