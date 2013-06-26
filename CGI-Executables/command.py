@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
+import sys
 import json
 import log
 import db_interact
 
+data=''
+
 try:
 	data = sys.stdin.readline()
 except:
-	log.log_error("Error reading '%s' from stdin\n\n" % data[:-1])
+	log.log_error("Error reading '%s' from stdin\n\n" % data)
 	sys.exit()
 
 #turn the string into json

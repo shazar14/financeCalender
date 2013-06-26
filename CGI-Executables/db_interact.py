@@ -2,6 +2,7 @@
 
 import MySQLdb
 import datetime
+import log
 
 ############################################################
 def connect_DB():
@@ -58,7 +59,8 @@ def change_months():
 ############################################################
 def get_all_bills():
 	try:
-		cursor.execute("select tbl_Bills.id, tbl_Bills.name, tbl_Bills.amount_due, tbl_Bills.current_month_due, tbl_Bills.current_status, tbl_Accounts.name, tbl_Bills.next_month_due, tbl_Bills.next_status, tbl_Bills.past_month_due, tbl_Bills.prev_status FROM tbl_Bills INNER JOIN tbl_Accounts ON tbl_Bills.account_index=tbl_Accounts.id ORDER BY day_of_month ASC;")
+		query = "SELECT tbl_Bills.id, tbl_Bills.name, tbl_Bills.amount_due, tbl_Bills.current_month_due, tbl_Bills.current_status, tbl_Accounts.name, tbl_Bills.next_month_due, tbl_Bills.next_status, tbl_Bills.past_month_due, tbl_Bills.prev_status FROM tbl_Bills INNER JOIN tbl_Accounts ON tbl_Bills.account_index=tbl_Accounts.id ORDER BY day_of_month ASC"
+		cursor.execute(query)
 		data = cursor.fetchall()
 		bill_id       	     = data[0]
 		name          	     = data[1]
@@ -72,8 +74,8 @@ def get_all_bills():
 		past_month_status    = data[9]	
 		
 	except MySQLdb.Error, e:
-    		db_close(connection, cursor)
 		log.log_error("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+    		close_DB(db)
 		return 0
 
 	result = '{ "bill_id" : [ ' + bill_id + ' ], "name" : [ ' +  name + ' ], "amount_due" : [ ' + amount_due  + ' ], "this_month_due_date" : [ ' + this_month_due_date + ' ], "this_month_status" : [ ' + this_month_status + ' ], "bill_paid_by_account" : [ ' + bill_paid_by_account + ' ], "next_due_date" : [ ' + next_due_date + '], "next_month_status" : [ ' + next_month_status + '], "past_month_due" : [ ' + past_month_due + '], "past_month_status" : [ ' + past_month_status + ']  }'
