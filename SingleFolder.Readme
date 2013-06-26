@@ -1,0 +1,5 @@
+1) Edit /etc/apache2/sites-available/default
+	Change DocumentRoot to the folder that contains index.html
+	Change ScrptAlias from /usr/lib/cgi-bin/ to the CGI-Executables directory that has command.py and the like
+	Add "AddHandler cgi-script .py" after the last </Directory> tag
+2) Reboot apache "sudo /etc/init.d/apache2 restart"
