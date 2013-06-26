@@ -28,3 +28,5 @@ try:
 except ValueError:
   log.log_error("Error converting jsonResults: '%s' to jsonData\n\n" %jsonResults)
   sys.exit()
+
+print result

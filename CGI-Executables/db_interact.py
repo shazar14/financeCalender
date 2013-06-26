@@ -3,6 +3,7 @@
 import MySQLdb
 import datetime
 import log
+import sys
 
 ############################################################
 def connect_DB():
@@ -10,6 +11,17 @@ def connect_DB():
 	cursor = db.cursor()
 	return db, cursor
 #endef
+
+###############################################################################
+def isNull( string ):
+
+  if(type(string) is str):
+    return string
+  elif(type(string) is datetime.datetime):
+    return string.strftime("%Y-%m-%d %H:%M:%S")
+  else:
+    return ''
+#endef ISNULL
 
 ############################################################
 def close_DB(db):
@@ -61,7 +73,6 @@ def get_all_bills():
 	db, cursor = connect_DB()
 	try:
 		query = "SELECT tbl_Bills.id, tbl_Bills.name, tbl_Bills.amount_due, tbl_Bills.current_month_due, tbl_Bills.current_status, tbl_Accounts.name, tbl_Bills.next_month_due, tbl_Bills.next_status, tbl_Bills.past_month_due, tbl_Bills.prev_status FROM tbl_Bills INNER JOIN tbl_Accounts ON tbl_Bills.account_index=tbl_Accounts.id WHERE 1"
-		print query
 		cursor.execute(query)
 		data = cursor.fetchall()
 		counter = 0
@@ -78,17 +89,17 @@ def get_all_bills():
 			past_month_due	     = result[8]
 			past_month_status    = result[9]	
 		
-			singleRecord = '{ "bill_id" : [ ' + bill_id + ' ], "name" : [ ' +  name + ' ], "amount_due" : [ ' + amount_due  + ' ], "this_month_due_date" : [ ' + this_month_due_date + ' ], "this_month_status" : [ ' + this_month_status + ' ], "bill_paid_by_account" : [ ' + bill_paid_by_account + ' ], "next_due_date" : [ ' + next_due_date + '], "next_month_status" : [ ' + next_month_status + '], "past_month_due" : [ ' + past_month_due + '], "past_month_status" : [ ' + past_month_status + ']  }'
+			singleRecord = '{ "bill_id" : [ "' + str(bill_id) + '" ], "name" : [ "' +  name + '" ], "amount_due" : [ "' + str(amount_due)  + '" ], "this_month_due_date" : [ "' + isNull(this_month_due_date) + '" ], "this_month_status" : [ "' + this_month_status + '" ], "bill_paid_by_account" : [ "' + bill_paid_by_account + '" ], "next_due_date" : [ "' + isNull(next_due_date) + '" ], "next_month_status" : [ "' + next_month_status + '"], "past_month_due" : [ "' + isNull(past_month_due) + '" ], "past_month_status" : [ "' + past_month_status + '" ]  }'
+
 			if(counter == len(data) - 1):
-				jsonResponse += jsonResponse + ' "%s" : [ %s ] }' %(counter, singleRecord)
+				jsonResponse = jsonResponse + '"%s" : [ %s ] }' % (counter, singleRecord)
 			else:
-				jsonResponse += jsonResponse + ' "%s" : [ %s ],  ' % (counter, singleRecord)
-			counter += 1 
+				jsonResponse = jsonResponse + '"%s" : [ %s ], ' % (counter, singleRecord)
+			counter = counter + 1 
 	except MySQLdb.Error, e:
 		log.log_error("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
     		close_DB(db)
 		return 0
-
 	return jsonResponse
 #endef
 
