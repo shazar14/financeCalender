@@ -4,11 +4,10 @@ import MySQLdb
 import datetime
 import log
 import sys
-
 ############################################################
 def connect_DB():
-	db = MySQLdb.connect("localhost","root","toor","finances" )
-	cursor = db.cursor()
+	db = MySQLdb.connect("localhost","otis","toor","finances2" )
+	cursor = db.cursor(MySQLdb.cursors.DictCursor)
 	return db, cursor
 #endef
 
@@ -19,6 +18,8 @@ def isNull( string ):
     return string
   elif(type(string) is datetime.datetime):
     return string.strftime("%Y-%m-%d %H:%M:%S")
+  elif(type(string) is int) or (type(string) is long):
+    return str(string)
   else:
     return ''
 #endef ISNULL
@@ -72,24 +73,23 @@ def change_months():
 def get_all_bills():
 	db, cursor = connect_DB()
 	try:
-		query = "SELECT tbl_Bills.id, tbl_Bills.name, tbl_Bills.amount_due, tbl_Bills.current_month_due, tbl_Bills.current_status, tbl_Accounts.name, tbl_Bills.next_month_due, tbl_Bills.next_status, tbl_Bills.past_month_due, tbl_Bills.prev_status FROM tbl_Bills INNER JOIN tbl_Accounts ON tbl_Bills.account_index=tbl_Accounts.id WHERE 1"
+		query = "SELECT tbl_Bills.id, tbl_Bills.name, tbl_Bills.amount_due, tbl_Bills.current_month_due, tbl_Bills.current_status, tbl_Accounts.name as AccountName, tbl_Bills.next_month_due, tbl_Bills.next_status, tbl_Bills.past_month_due, tbl_Bills.prev_status FROM tbl_Bills INNER JOIN tbl_Accounts ON tbl_Bills.account_index=tbl_Accounts.id WHERE 1"
 		cursor.execute(query)
 		data = cursor.fetchall()
 		counter = 0
 		jsonResponse = '{'
 		for result in data:
-			bill_id       	     = result[0]
-			name          	     = result[1]
-			amount_due           = result[2]
-			this_month_due_date  = result[3]
-			this_month_status    = result[4]
-			bill_paid_by_account = result[5]
-			next_due_date        = result[6]
-			next_month_status    = result[7]
-			past_month_due	     = result[8]
-			past_month_status    = result[9]	
-		
-			singleRecord = '{ "bill_id" : [ "' + str(bill_id) + '" ], "name" : [ "' +  name + '" ], "amount_due" : [ "' + str(amount_due)  + '" ], "this_month_due_date" : [ "' + isNull(this_month_due_date) + '" ], "this_month_status" : [ "' + this_month_status + '" ], "bill_paid_by_account" : [ "' + bill_paid_by_account + '" ], "next_due_date" : [ "' + isNull(next_due_date) + '" ], "next_month_status" : [ "' + next_month_status + '"], "past_month_due" : [ "' + isNull(past_month_due) + '" ], "past_month_status" : [ "' + past_month_status + '" ]  }'
+			bill_id       	     = result["id"]
+			name          	     = result["name"]
+			amount_due           = result["amount_due"]
+			this_month_due_date  = result["current_month_due"]
+			this_month_status    = result["current_status"]
+			bill_paid_by_account = result["AccountName"]
+			next_due_date        = result["next_month_due"]
+			next_month_status    = result["next_status"]
+			past_month_due	     = result["past_month_due"]
+			past_month_status    = result["prev_status"]	
+			singleRecord = '{ "bill_id" : [ "' + isNull(bill_id) + '" ], "name" : [ "' +  isNull(name) + '" ], "amount_due" : [ "' + isNull(amount_due)  + '" ], "this_month_due_date" : [ "' + isNull(this_month_due_date) + '" ], "this_month_status" : [ "' + isNull(this_month_status) + '" ], "bill_paid_by_account" : [ "' + isNull(bill_paid_by_account) + '" ], "next_due_date" : [ "' + isNull(next_due_date) + '" ], "next_month_status" : [ "' + isNull(next_month_status) + '"], "past_month_due" : [ "' + isNull(past_month_due) + '" ], "past_month_status" : [ "' + isNull(past_month_status) + '" ]  }'
 
 			if(counter == len(data) - 1):
 				jsonResponse = jsonResponse + '"%s" : [ %s ] }' % (counter, singleRecord)

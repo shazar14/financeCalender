@@ -4,7 +4,6 @@ import sys
 import json
 import log
 import db_interact
-
 data=''
 
 try:
@@ -29,4 +28,4 @@ except ValueError:
   log.log_error("Error converting jsonResults: '%s' to jsonData\n\n" %jsonResults)
   sys.exit()
 
-print result
+print str(result)
