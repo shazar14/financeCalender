@@ -23,9 +23,11 @@ if(jsonData['request'] == 'queryAll'):
 	jsonResults = db_interact.get_all_bills()
 
 try:
-  result = json.loads(jsonResults)
+  result = jsonResults
 except ValueError:
   log.log_error("Error converting jsonResults: '%s' to jsonData\n\n" %jsonResults)
   sys.exit()
 
-print str(result)
+print "Content-Type: application/json"
+print
+print result

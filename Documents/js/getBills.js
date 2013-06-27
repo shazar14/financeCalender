@@ -10,8 +10,14 @@ $(document).ready(function() {
 		    alert("ERROR:" + jqXHR.responseText);
 		},
 		success: function(data){ //data is in custom JSON object.  See database_transactions.py for definition
-		
-
+			data = $.parseJSON(data);
+			$.each(data, function(table, tableObject) {		
+				$.each(tableObject, function(key, value){
+					$.each(value, function(id, name){
+						
+					});
+				});
+			});
 		}
 	      });
 
