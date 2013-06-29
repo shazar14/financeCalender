@@ -6,7 +6,9 @@ import log
 import sys
 ############################################################
 def connect_DB():
-	db = MySQLdb.connect("localhost","otis","toor","finances2" )
+#	db = MySQLdb.connect("localhost","otis","toor","finances2" )
+	db = MySQLdb.connect("localhost","root","toor","finances" )
+	
 	cursor = db.cursor(MySQLdb.cursors.DictCursor)
 	return db, cursor
 #endef
