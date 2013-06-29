@@ -142,7 +142,7 @@ def get_all_bills():
 			row.appendChild(next_month_status)
 			row.appendChild(past_month_due)
 			row.appendChild(past_month_status)
-			
+			count +=1	
 	except MySQLdb.Error, e:
 		log.log_error("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
     		close_DB(db)
