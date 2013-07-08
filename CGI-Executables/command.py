@@ -21,6 +21,8 @@ except ValueError:
 
 if(jsonData['request'] == 'queryAll'):
 	jsonResults = db_interact.get_all_bills()
+elif(jsonData['request'] == 'billInfo'):
+	jsonResults = db_interact.list_bills()
 
 try:
   result = jsonResults
