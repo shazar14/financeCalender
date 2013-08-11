@@ -19,9 +19,9 @@
 -- Current Database: `finances2`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `finances2` /*!40100 DEFAULT CHARACTER SET utf8 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `finances` /*!40100 DEFAULT CHARACTER SET utf8 */;
 
-USE `finances2`;
+USE `finances`;
 
 --
 -- Table structure for table `tbl_Accounts`
