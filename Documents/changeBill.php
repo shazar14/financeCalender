@@ -1,7 +1,7 @@
 <head>
-<script src="js/jquery-1.9.1.js"></script>
-<script src="js/jquery-ui.js"></script>
-<script src="js/changeBill.js"></script>
+	<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<script src="js/changeBill.js"></script>
 </head>
 <body>
 <input type='hidden' id="billName" value='<?php echo $_GET['bill']; ?>'>
