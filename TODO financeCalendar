@@ -1,0 +1,13 @@
+TODO financeCalendar:
+	* Be able to edit all the monthly bills on the Edit Bill page
+	* Add functionality to be able to add a new bill on the Add Bill page
+	* Be able to add a new payable account, or mark a existing bill account as a payable account
+	* Bill Analytics? new tab? 
+		* was thinking maybe move the calendar to the left and run some basic bill stats (monthly and weekly totals, maybe total bills left for the month, others?) on the right side of the page
+
+
+
+
+Bugs:
+	* Fix design layout of changeBill
+	* If you drag a bill to the next month, it changes the next months bill instead of the one you dragged
