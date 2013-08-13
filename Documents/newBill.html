@@ -1,1 +1,30 @@
-<p>This is where you add a new bill</p>
+<script src='js/jquery-1.9.1.js'></script>
+<script src='js/newBill.js'></script>
+<form id='newBill'>
+<fieldset>
+	<legend>Add New Bill</legend>
+	<label for='name'>Bill:</label><input id='name' name='name'></input><br />
+	<label for='amount'>Amount:</label><input id='amount' name='amount'></input><br />
+	<label for='dayOfMonth'>Day of Month:</label><input id='dayOfMonth' name='dayOfMonth'></input></br>
+	<div style='float: left; margin-left: 42%; margin-top: 10px'>
+		<fieldset>
+			<input type='radio' value='Automatic' name='status' id='r_Auto'>Automatic
+			<input type='radio' value='Manual' name='status' id='r_Manual'>Manual<br />
+			<select id='pay_accounts'></select>
+		</fieldset>
+	</div>
+        <div style='float: left; margin-left: 46%'>
+		<button id="newBillButton">Add New Bill</button>
+	</div>
+
+</fieldset>
+<form id='newAccount'>
+<fieldset>
+	<legend>Add New Pay Account</legend>
+	<label for='account'>Account Name:</label><input id='account' name='account' type='input'></input><br />
+        <div style='float: left; margin-left: 46%'>
+		<button id="newAccountButton">Add Pay Account</button>
+	</div>
+</fieldset>
+</form>
+</form>
