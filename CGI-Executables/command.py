@@ -29,8 +29,14 @@ elif(jsonData['request'] == 'getBill'):
 	jsonResults = db_interact.get_bill(jsonData['bill'], jsonData['date'])
 elif(jsonData['request'] == 'getAccounts'):
 	jsonResults = db_interact.get_accounts()
+elif(jsonData['request'] == 'addAccount'):
+	jsonResults = db_interact.add_account( jsonData['account'] )
+elif(jsonData['request'] == 'addBill'):
+	jsonResults = db_interact.add_bill(jsonData['name'], jsonData['amount'], jsonData['dueDay'], jsonData['pay_type'], jsonData['pay_account'] )
 elif(jsonData['request'] == 'changeBill'):
 	jsonResults = db_interact.change_bill(jsonData['stat'], jsonData['pay_type'], jsonData['bill'], jsonData['pay_method'], jsonData['amount'], jsonData['month'])
+else:
+	jsonResults = '{ "valid" : "no results" }'
 
 try:
   result = jsonResults

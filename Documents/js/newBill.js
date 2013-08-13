@@ -1,9 +1,20 @@
 $(document).ready(function() {
       	$("#pay_accounts").hide();
 
-	$('#newBill').submit(function(sub){
+	$('#newBillButton').click(function(sub){
 		sub.preventDefault();
-		alert("Not Working yet, fill out submit bill stuff");
+
+		parameters = JSON.stringify({request:'addBill', name:$('#name').val(), amount:$('#amount').val(), dueDay:$('#dayOfMonth').val(), pay_type:$("input:radio[name='status']:checked").val(), pay_account:$('#pay_accounts').val()});
+		$.ajax({
+			url: 'cgi-bin/command.py',
+			type: 'POST',
+			data: parameters,
+			dataType: 'text',
+			error: function(jqXHR, error, errorThrown){
+				alert("Error submitting new account");
+			},
+			success: function(){ alert('yo');}
+		});
 	});	
 
 	$('#newAccountButton').click(function(sub1){

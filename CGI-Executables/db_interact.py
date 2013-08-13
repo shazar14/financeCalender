@@ -81,6 +81,15 @@ def bill_info():
 		sys.exit(1)
 #endef
 ############################################################
+def add_bill(name, amount, dueDay, pay_type, pay_account):
+	db, cursor = connect_DB()
+
+
+
+	return '{ "valid" : "true" }'
+
+#endef
+############################################################
 def change_bill(status, pay_type, bill, pay_account, amount, month):
 	db, cursor = connect_DB()
 	table = "tbl_" + calendar.month_name[int(month)]
@@ -139,12 +148,22 @@ def get_bill(bill, billMonth):
 			return jsonResponse + ' }'
 #endef
 ############################################################
+def add_account(account):
+	db, cursor = connect_DB()
+
+	query = "INSERT INTO tbl_Accounts(name) VALUES('%s')" % MySQLdb.escape_string(account)
+	cursor.execute( query )
+	db.commit()
+	return '{ "valid" : "true"}'
+
+#endef
+############################################################
 def get_accounts():
 	db, cursor = connect_DB()
 	jsonResponse = '{'
 	counter = 0
 
-	query = "SELECT name FROM tbl_Accounts"
+	query = "SELECT name FROM `tbl_Accounts` WHERE name!='None'"
 	cursor.execute( query )
 	results = cursor.fetchall()
 	for result in results:
