@@ -6,6 +6,9 @@ TODO financeCalendar:
 		* was thinking maybe move the calendar to the left and run some basic bill stats (monthly and weekly totals, maybe total bills left for the month, others?) on the right side of the page
 
 
+Security:
+	* Validate input from the change bill page (as well as the other add and edit pages when they are implemented)
+	* access restrictions?
 
 
 Bugs:
