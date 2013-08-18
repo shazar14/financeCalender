@@ -1,10 +1,37 @@
 $(document).ready(function() {
       	$("#pay_accounts").hide();
+      	$("#months").hide();
 
 	$('#newBillButton').click(function(sub){
 		sub.preventDefault();
+		var month_array = new Array();
+		if($("#r_jan").is(':checked'))
+			month_array.push('January');
+		if($("#r_feb").is(':checked'))
+			month_array.push('February');
+		if($("#r_march").is(':checked'))
+			month_array.push('March');
+		if($("#r_april").is(':checked'))
+			month_array.push('April');
+		if($("#r_may").is(':checked'))
+			month_array.push('May');
+		if($("#r_jun").is(':checked'))
+			month_array.push('June');
+		if($("#r_jul").is(':checked'))
+			month_array.push('July');
+		if($("#r_aug").is(':checked'))
+			month_array.push('August');
+		if($("#r_sept").is(':checked'))
+			month_array.push('September');
+		if($("#r_oct").is(':checked'))
+			month_array.push('October');
+		if($("#r_nov").is(':checked'))
+			month_array.push('November');
+		if($("#r_dec").is(':checked'))
+			month_array.push('December');
+		
 
-		parameters = JSON.stringify({request:'addBill', name:$('#name').val(), amount:$('#amount').val(), dueDay:$('#dayOfMonth').val(), pay_type:$("input:radio[name='status']:checked").val(), pay_account:$('#pay_accounts').val()});
+		parameters = JSON.stringify({request:'addBill', name:$('#name').val(), amount:$('#amount').val(), dueDay:$('#dayOfMonth').val(), pay_type:$("input:radio[name='status']:checked").val(), pay_account:$('#pay_accounts').val(), months:month_array, repeat:$("input:radio[name='repeating']:checked").val()});
 		$.ajax({
 			url: 'cgi-bin/command.py',
 			type: 'POST',
@@ -13,7 +40,7 @@ $(document).ready(function() {
 			error: function(jqXHR, error, errorThrown){
 				alert("Error submitting new account");
 			},
-			success: function(){ alert('yo');}
+			success: function(){ }
 		});
 	});	
 
@@ -59,6 +86,14 @@ $(document).ready(function() {
     		}
 		else
       			$("#pay_accounts").show();
+			
+	});
+	$("#r_monthly, #r_custom").change(function(){
+    		if($(this).val() == 'monthly'){
+      			$("#months").hide();
+    		}
+		else
+      			$("#months").show();
 			
 	});
 });

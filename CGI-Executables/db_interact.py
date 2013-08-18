@@ -81,11 +81,59 @@ def bill_info():
 		sys.exit(1)
 #endef
 ############################################################
-def add_bill(name, amount, dueDay, pay_type, pay_account):
+def add_bill(name, amount, dueDay, pay_type, pay_account, months, repeat_options):
 	db, cursor = connect_DB()
+	
+	if( pay_type == 'Manual'):
+		pay_account = 'None'
+	try:
+		query = "SELECT id FROM tbl_Accounts WHERE name='%s'" % pay_account
+		num_rows = cursor.execute( query )
+		if( num_rows == 1):
+			rows = cursor.fetchall()
+			pay_account_id = rows[0]['id']
+		else:
+			return '{ "valid" : "db error" }'
+	except MySQLdb.Error, e:
+		print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+		close_DB(db)
+		sys.exit(1)
+		
+	try:
+		query = "INSERT INTO tbl_Bills(name, amount_due, day_of_month, payment_type, account_index) VALUES('%s', %.02f, %d, '%s', %d )" % (name, decimal.Decimal(amount), int(dueDay), pay_type, pay_account_id) 
+		cursor.execute( query )
+		db.commit()
+	except MySQLdb.Error, e:
+		print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+		close_DB(db)
+		sys.exit(1)
 
+	insertID = cursor.lastrowid
+	current_month = datetime.datetime.now().month
+	#table = "tbl_" + calendar.month_name[int(current_month)]
+	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
+	if( repeat_options == 'monthly' ):
+		for i in range((current_month-1), 12):
+			query = "INSERT INTO %s(bill_id, status, day_of_month, amount) VALUES(%d, 'Due', %d, %.02f)" % (tables[i], insertID, int(dueDay), decimal.Decimal(amount)) 	
+			try:
+				cursor.execute( query )
+				db.commit()
+			except MySQLdb.Error, e:
+				print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+				close_DB(db)
+				sys.exit(1)
 
-
+	else:
+		for month in months:
+			query = "INSERT INTO tbl_%s(bill_id, status, day_of_month, amount) VALUES(%d, 'Due', %d, %.02f)" % (month, insertID, int(dueDay), decimal.Decimal(amount)) 	
+			try:
+				cursor.execute( query )
+				db.commit()
+			except MySQLdb.Error, e:
+				print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+				close_DB(db)
+				sys.exit(1)
+			
 	return '{ "valid" : "true" }'
 
 #endef
@@ -227,13 +275,3 @@ def get_all_bills():
 	return jsonResponse
 #endef
 
-#################
-#     MAIN      #
-#################
-
-#db, cursor = connect_DB()
-#change_months()
-#result = get_all_bills()
-#print result
-#close_DB(dbl)
-#list_bills()

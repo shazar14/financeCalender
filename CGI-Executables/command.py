@@ -32,11 +32,11 @@ elif(jsonData['request'] == 'getAccounts'):
 elif(jsonData['request'] == 'addAccount'):
 	jsonResults = db_interact.add_account( jsonData['account'] )
 elif(jsonData['request'] == 'addBill'):
-	jsonResults = db_interact.add_bill(jsonData['name'], jsonData['amount'], jsonData['dueDay'], jsonData['pay_type'], jsonData['pay_account'] )
+	jsonResults = db_interact.add_bill(jsonData['name'], jsonData['amount'], jsonData['dueDay'], jsonData['pay_type'], jsonData['pay_account'], jsonData['months'], jsonData['repeat'] )
 elif(jsonData['request'] == 'changeBill'):
 	jsonResults = db_interact.change_bill(jsonData['stat'], jsonData['pay_type'], jsonData['bill'], jsonData['pay_method'], jsonData['amount'], jsonData['month'])
 else:
-	jsonResults = '{ "valid" : "no results" }'
+	jsonResults = '{ "valid" : "no command recognized" }'
 
 try:
   result = jsonResults
