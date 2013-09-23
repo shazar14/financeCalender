@@ -40,7 +40,9 @@ $(document).ready(function() {
 			error: function(jqXHR, error, errorThrown){
 				alert("Error submitting new account");
 			},
-			success: function(){ }
+			success: function(){
+				location.reload();	
+			}
 		});
 	});	
 
@@ -56,7 +58,9 @@ $(document).ready(function() {
 			error: function(jqXHR, error, errorThrown){
 				alert("Error submitting new account");
 			},
-			success: function(){}
+			success: function(){
+				location.reload();
+			}
 		});
 	});
 

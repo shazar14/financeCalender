@@ -35,16 +35,50 @@ def close_DB(db):
 #endef
 
 ############################################################
+def delete(bill_id):
+	db, cursor = connect_DB()
+	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
+	for table in tables:
+		query = "SELECT * FROM %s WHERE bill_id=%d" %(table, int(bill_id))
+		try:
+			num_rows = cursor.execute( query )
+		except MySQLdb.Error, e:
+			print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+			close_DB(db)
+			sys.exit(1)
+		if(num_rows > 0):
+			query = "DELETE FROM %s WHERE bill_id=%d" %(table, int(bill_id))
+			try:
+				cursor.execute(query)
+				db.commit()
+			except MySQLdb.Error, e:
+				print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+				close_DB(db)
+				sys.exit(1)
+	query = "DELETE FROM tbl_Bills WHERE id=%d" % int(bill_id)
+	try:
+		cursor.execute(query)
+		db.commit()
+	except MySQLdb.Error, e:
+		print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+		close_DB(db)
+		sys.exit(1)
+
+	return '{ "valid" : "true" }'
+			
+#endef
+
+############################################################
 def list_bills():
 	db, cursor = connect_DB()
 	counter = 0
 	jsonResponse = '{'
 	try:
-		query = "SELECT tbl_Bills.name, tbl_Bills.amount_due, tbl_Bills.day_of_month, tbl_Bills.payment_type, tbl_Accounts.name AS account FROM tbl_Bills INNER JOIN tbl_Accounts ON tbl_Accounts.id=tbl_Bills.account_index"
+		query = "SELECT tbl_Bills.id, tbl_Bills.name, tbl_Bills.amount_due, tbl_Bills.day_of_month, tbl_Bills.payment_type, tbl_Accounts.name AS account FROM tbl_Bills INNER JOIN tbl_Accounts ON tbl_Accounts.id=tbl_Bills.account_index"
 		cursor.execute( query )
 		rows = cursor.fetchall()
 		for row in rows:
-			singleRecord = '{ "account" : "' + row['account'] + '", "name" : "' + row['name'] + '", "amount" : "' + isNull(row['amount_due']) + '", "dayofmonth" : "' + isNull(row['day_of_month']) + '", "paymentType" : "' + row['payment_type'] + '" }' 
+			singleRecord = '{ "id" : "' + isNull(row['id']) + '", "account" : "' + row['account'] + '", "name" : "' + row['name'] + '", "amount" : "' + isNull(row['amount_due']) + '", "dayofmonth" : "' + isNull(row['day_of_month']) + '", "paymentType" : "' + row['payment_type'] + '" }' 
 			if(counter == len(rows) - 1):
 				jsonResponse = jsonResponse + '"%s" : [ %s ] }' % (counter, singleRecord)
 			else:
@@ -110,9 +144,10 @@ def add_bill(name, amount, dueDay, pay_type, pay_account, months, repeat_options
 
 	insertID = cursor.lastrowid
 	current_month = datetime.datetime.now().month
+	current_day = datetime.datetime.now().day
 	#table = "tbl_" + calendar.month_name[int(current_month)]
 	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
-	if( repeat_options == 'monthly' ):
+	if( repeat_options == 'monthly' and int(dueDay) >= current_day ):
 		for i in range((current_month-1), 12):
 			query = "INSERT INTO %s(bill_id, status, day_of_month, amount) VALUES(%d, 'Due', %d, %.02f)" % (tables[i], insertID, int(dueDay), decimal.Decimal(amount)) 	
 			try:
@@ -122,7 +157,16 @@ def add_bill(name, amount, dueDay, pay_type, pay_account, months, repeat_options
 				print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
 				close_DB(db)
 				sys.exit(1)
-
+	elif( repeat_options == 'monthly' and int(dueDay) < current_day):
+		for i in range(current_month, 12):
+			query = "INSERT INTO %s(bill_id, status, day_of_month, amount) VALUES(%d, 'Due', %d, %.02f)" % (tables[i], insertID, int(dueDay), decimal.Decimal(amount)) 	
+			try:
+				cursor.execute( query )
+				db.commit()
+			except MySQLdb.Error, e:
+				print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+				close_DB(db)
+				sys.exit(1)
 	else:
 		for month in months:
 			query = "INSERT INTO tbl_%s(bill_id, status, day_of_month, amount) VALUES(%d, 'Due', %d, %.02f)" % (month, insertID, int(dueDay), decimal.Decimal(amount)) 	
