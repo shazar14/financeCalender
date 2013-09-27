@@ -28,13 +28,14 @@
 		</fieldset>
 		<fieldset>
 		   <div style='float: left; margin-left: 31%'>
-			<input type="radio" value='Automatic' name="status" id="r_Auto" disabled='disabled'>Automatic
-			<input type="radio" value='Manual' name="status" id="r_Manual" disabled='disabled'>Manual
-			<select id='pay_method' disabled='disabled'></select><br />
+			<input type="radio" value='Automatic' name="status" id="r_Auto">Automatic
+			<input type="radio" value='Manual' name="status" id="r_Manual">Manual
+			<select id='pay_method'></select><br />
 		   </div>
 		</fieldset>
-		<div style='float: left; margin-left: 44%'>
-			<button id="button">Change Bill</button>
+		<div style='float: left; margin-left: 30%'>
+			<button id="button">Change Current Bill</button>
+			<button id="button2">Change All Future Bills</button>
 		</div>
 	</form>
 </body>

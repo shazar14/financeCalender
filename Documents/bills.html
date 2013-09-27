@@ -13,17 +13,64 @@
 		font-size: 14px;
 		font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
 		}
-
+	.hideoverflow{
+		overflow: hidden;
+	}
+	.inner{
+		position: relative;
+		left: -75%;
+		float: left;
+	}
+	#container {
+		float: left;
+		width: 99%;
+	}
+	#left {
+		clear: left;
+  		float: left;
+  		width: 65%;          /* LC width */
+  		padding: 10px 0;
+  		margin: 0 1% 0 2%;
+  		display: inline;	
+	}
+	#right {
+		float: right;
+		width: 28%;
+		padding: 10px 0;
+		margin: 0 2% 0 1%;
+		display: inline;
+	}
+	#footer {
+		clear: both;
+		height:25px;
+	}
 	#calendar {
 		width: 900px;
 		margin: 0 auto;
-		}
+	}
 
 </style>
 </head>
 <body>
-
-<div id='calendar'></div>
+<div>
+	<div id="header"></div>
+		<div id="container">
+			<div id="left">
+				<div id='calendar'></div>
+			</div>
+			<div id="right">
+				<table id="analytics" style="margin-top=10px">
+					<tr>
+						<th>Due</th>
+					</tr>
+					<tr>
+						<td>11.42</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	<div id="footer"></div>
+</div>
 <div><br />Blue = Paid<br />Orange = Due (Auto pay [account])<br />Red = Due<br />Green = Skip<br />Drag and drop bill to change current months due date<br />Click on bill to edit amount due and bill status</div>
 </body>
 
