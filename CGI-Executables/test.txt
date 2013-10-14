@@ -1,0 +1,8 @@
+SELECT SQL_CALC_FOUND_ROWS amount_due FROM tbl_Bills  ORDER BY  amount_due asc LIMIT 0, -1
+SELECT SQL_CALC_FOUND_ROWS amount_due FROM tbl_Bills  ORDER BY  amount_due asc LIMIT 0, -1
+SELECT SQL_CALC_FOUND_ROWS amount_due FROM tbl_Bills  ORDER BY  amount_due asc LIMIT 0, -1
+MiniFieldStorage('iDisplayLength', '-1')SELECT SQL_CALC_FOUND_ROWS amount_due FROM tbl_Bills  ORDER BY  amount_due asc LIMIT 0, -1
+SELECT SQL_CALC_FOUND_ROWS amount_due FROM tbl_Bills  ORDER BY  amount_due asc LIMIT 0, -1
+-1
+SELECT SQL_CALC_FOUND_ROWS amount_due FROM tbl_Bills  ORDER BY  amount_due asc LIMIT 0, -1
+SELECT SQL_CALC_FOUND_ROWS amount_due FROM tbl_Bills  ORDER BY  amount_due asc LIMIT 0, -1

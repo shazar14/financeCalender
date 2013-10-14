@@ -1,8 +1,10 @@
 <script src='js/fullcalendar.min.js'></script>
 <link href='css/fullcalendar.css' rel='stylesheet' />
+<link href='css/jquery.dataTables.css' rel='stylesheet' />
 <!-- Add fancyBox main JS and CSS files -->
 <script type="text/javascript" src="js/jquery.fancybox.js"></script>
 <link rel="stylesheet" type="text/css" href="css/jquery.fancybox.css" media="screen" /><link href='css/fullcalendar.print.css' rel='stylesheet' media='print' />
+<script src='js/jquery.dataTables.js'></script>
 <script src='js/getBills.js'></script>
 
 <style>
@@ -37,7 +39,7 @@
 		float: right;
 		width: 28%;
 		padding: 10px 0;
-		margin: 0 2% 0 1%;
+		margin: 43 0% 0 1%;
 		display: inline;
 	}
 	#footer {
@@ -59,13 +61,21 @@
 				<div id='calendar'></div>
 			</div>
 			<div id="right">
-				<table id="analytics" style="margin-top=10px">
-					<tr>
+				<table id="analytics">
+					<thead>
+						<th>Week</th>
+						<th>Week Total</th>
 						<th>Due</th>
-					</tr>
-					<tr>
-						<td>11.42</td>
-					</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+				<br />
+				<table id="month">
+					<thead>
+						<th>Calendar Total</th>
+						<th>Calendar Due</th>
+					</thead>
+					<tbody></tbody>
 				</table>
 			</div>
 		</div>

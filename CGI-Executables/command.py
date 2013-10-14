@@ -35,8 +35,14 @@ elif(jsonData['request'] == 'addBill'):
 	jsonResults = db_interact.add_bill(jsonData['name'], jsonData['amount'], jsonData['dueDay'], jsonData['pay_type'], jsonData['pay_account'], jsonData['months'], jsonData['repeat'] )
 elif(jsonData['request'] == 'changeBill'):
 	jsonResults = db_interact.change_bill(jsonData['stat'], jsonData['pay_type'], jsonData['bill'], jsonData['pay_method'], jsonData['amount'], jsonData['month'])
+elif(jsonData['request'] == 'changeAllBill'):
+	jsonResults = db_interact.change_all_bill(jsonData['stat'], jsonData['pay_type'], jsonData['bill'], jsonData['pay_method'], jsonData['amount'], jsonData['month'])
 elif(jsonData['request'] == 'delete'):
 	jsonResults = db_interact.delete(jsonData['data'])
+elif(jsonData['request'] == 'checkDelete'):
+	jsonResults = db_interact.deleteStatus(jsonData['data'])
+elif(jsonData['request'] == '6weeks'):
+	jsonResults = db_interact.weeks(jsonData['weeksArray'])
 else:
 	jsonResults = '{ "valid" : "no command recognized" }'
 

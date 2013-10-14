@@ -1,10 +1,8 @@
 $(document).ready(function() {
 
-	$('#editBill').submit(function(sub){
+	$('#button').click(function(sub){
 		submit = true;
 		//perform some error checking
-
-
 		if(!submit)
 			sub.preventDefault();
 		else
@@ -24,12 +22,35 @@ $(document).ready(function() {
 					parent.$('#calendar').fullCalendar( 'removeEvents' );
 					parent.$.fancybox.close();
 					parent.getBills();
+					parent.tables();
 				}
-				
-
 			});
 		}
+
 	});
+	$('#button2').click(function(sub){
+		submit = true;
+
+		if(!submit)
+			sub.preventDefault();
+		else
+			parameters = JSON.stringify({stat : $("input:radio[name='billStatus']:checked").val(), pay_type : $("input:radio[name='status']:checked").val(), request : 'changeAllBill', bill : $('#bill').val(),  pay_method : $('#pay_method').val(), amount : $('#amount').val(), month : billDate});
+			url: 'cgi-bin/command.py',
+			type: 'POST',
+			data: parameters,
+			dataType: 'text',
+			error: function(jqXHR, error, errorThrown){
+				alert("Error submitting change bill");
+			},
+			success: function(){
+				parent.$('#calendar').fullCalendar( 'removeEvents' );
+				parent.$.fancybox.close();
+				parent.getBills();
+				parent.tables();
+			}
+	});
+	/*$('#editBill').submit(function(sub){
+	});*/
 	$('#button').button();
 	parameters = JSON.stringify({request:'getAccounts'});
 	$.ajax({

@@ -35,6 +35,27 @@ def close_DB(db):
 #endef
 
 ############################################################
+def deleteStatus(bill_id):
+	db, cursor = connect_DB()
+	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
+	query = "SELECT * FROM tbl_Bills WHERE id=%d" % int(bill_id)
+	jsonResponse = '{ "name":'
+	try:
+		num_rows = cursor.execute(query)
+	except MySQLdb.Error, e:
+		print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+		close_DB(db)
+		sys.exit(1)
+	if num_rows > 1:
+		return '{ "valid":"false"}'
+	else:
+		row = cursor.fetchone()
+		jsonResponse = jsonResponse + '"' + row['name'] + '", "amount":"' + str(decimal.Decimal(row['amount_due'])) + '"}'
+		return jsonResponse
+		
+			
+#endef
+############################################################
 def delete(bill_id):
 	db, cursor = connect_DB()
 	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
@@ -46,7 +67,7 @@ def delete(bill_id):
 			print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
 			close_DB(db)
 			sys.exit(1)
-		if(num_rows > 0):
+		if(num_rows == 1):
 			query = "DELETE FROM %s WHERE bill_id=%d" %(table, int(bill_id))
 			try:
 				cursor.execute(query)
@@ -197,7 +218,21 @@ def change_bill(status, pay_type, bill, pay_account, amount, month):
 			cursor.execute(query)
 			db.commit()
 	
+#endef
+############################################################
+def change_all_bill(status, pay_type, bill, pay_account, amount, month):
+	db, cursor = connect_DB()
+	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
 
+	query = "SELECT id FROM tbl_Bills WHERE name='%s'" % bill 
+	cursor.execute(query)
+	row = cursor.fetchone()
+
+	for i in range(int(month), 12):
+		for result in results:
+			query = "UPDATE %s SET status='%s', amount=%.02f WHERE bill_id=%d" % (table, status, decimal.Decimal(amount), result['id'])
+			cursor.execute(query)
+			db.commit()
 #endef
 ############################################################
 def change_day(dayToChange, title, monthToChange):
@@ -269,6 +304,69 @@ def get_accounts():
 
 #endef
 ############################################################
+def weeks(weeks):
+	db, cursor = connect_DB()
+	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
+	week=1
+	monthCost = 0
+	monthDue = 0
+	jsonResponse = '{'
+	for i in range(0, 24, 4):
+		cost = 0
+		due = 0
+		if weeks[i+2] > weeks[i]:
+			query1 = "SELECT SUM(amount) AS sum FROM %s WHERE day_of_month >= %d" % (tables[weeks[i] - 1], weeks[i+1])
+			query2 = "SELECT SUM(amount) AS sum  FROM %s WHERE day_of_month <= %d" % (tables[weeks[i+2] - 1], weeks[i+3])
+			cursor.execute( query1 )
+			data1 = cursor.fetchall()
+			if data1[0]['sum'] != None:
+				cost += decimal.Decimal(data1[0]['sum'])
+				monthCost += decimal.Decimal(data1[0]['sum'])
+			cursor.execute( query2 )
+			data2 = cursor.fetchall()
+			if data2[0]['sum'] != None:
+				cost += decimal.Decimal(data2[0]['sum'])
+				monthCost += decimal.Decimal(data2[0]['sum'])
+		#	jsonResponse = jsonResponse + '"week' + str(week) + '":"' + str(decimal.Decimal(cost)) + '", '
+			#print "[%d/%d-%d/%d] Week%s Total: %.02f\t" % (weeks[i], weeks[i+1], weeks[i+2], weeks[i+3], week, decimal.Decimal(cost)),
+
+			cursor.execute( query1 + " AND status!='Paid'" )
+			data = cursor.fetchall()
+			if data[0]['sum'] != None:
+				due += decimal.Decimal(data[0]['sum'])
+				monthDue += decimal.Decimal(data[0]['sum'])
+			cursor.execute( query2 + " AND status!='Paid'" )
+			data = cursor.fetchall()
+			if data[0]['sum'] != None:
+				due += decimal.Decimal(data[0]['sum'])
+				monthDue += decimal.Decimal(data[0]['sum'])
+		#	jsonResponse = jsonResponse + '"week' + str(week) + 'Due":"' + str(decimal.Decimal(due)) + '", '
+			#print "Remaining Due: %.02f" % decimal.Decimal(due)	
+		else:
+			query = "SELECT SUM(amount) AS sum FROM %s WHERE day_of_month >= %d and day_of_month <= %d" % (tables[weeks[i] - 1], weeks[i+1], weeks[i+3])
+			cursor.execute( query )
+			data = cursor.fetchall()
+			if data[0]['sum'] != None:
+				cost += decimal.Decimal(data[0]['sum'])
+				monthCost += decimal.Decimal(data[0]['sum'])
+			#jsonResponse = jsonResponse + '"week' + week + '":"' + decimal.Decimal(cost) + '", '
+			#print "[%d/%d-%d/%d] Week%s Total: %.02f\t" % (weeks[i], weeks[i+1], weeks[i+2], weeks[i+3], week, decimal.Decimal(cost)),
+
+			cursor.execute( query + " AND status!='Paid'" )
+			data = cursor.fetchall()
+			if data[0]['sum'] != None:
+				due += decimal.Decimal(data[0]['sum'])
+				monthDue += decimal.Decimal(data[0]['sum'])
+			#jsonResponse = jsonResponse + '"week' + week + 'Due":"' + decimal.Decimal(due) + '", '
+			#print "Remaining Due: %.02f" % decimal.Decimal(due)
+		jsonResponse = jsonResponse + '"week' + str(week) + 'Due":"' + str(decimal.Decimal(due)) + '", "Date' + str(week) + '":"' + str(weeks[i]) + '/' + str(weeks[i+1]) + '-' + str(weeks[i+2]) + '/' + str(weeks[i+3]) + '", '
+		jsonResponse = jsonResponse + '"week' + str(week) + '":"' + str(decimal.Decimal(cost)) + '", '
+		week = week + 1
+	jsonResponse = jsonResponse + '"calendarCost":"' + str(decimal.Decimal(monthCost)) + '", "calendarDue":"' + str(decimal.Decimal(monthDue)) + '"}'
+	return(jsonResponse)
+#endef
+
+############################################################
 def get_all_bills():
 	db, cursor = connect_DB()
 	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
@@ -299,10 +397,13 @@ def get_all_bills():
 				due_date = datetime.date.strftime( due_date, "%Y-%m-%d" )
 				#blue out the automatically paid bills
 				if( monthCounter == current_month and current_day > int(day) and payment_type == 'Automatic'):
+					#print name, day, status, payment_type, monthCounter, current_month, current_day, day
 					status = 'Paid' 
 					query2 = "UPDATE %s SET status='Paid' WHERE bill_id=%s" % (month, bill_id)
 					cursor.execute(query2)
 					db.commit()				
+				#elif( monthCounter == 10 ):
+				#	print name, day, status, payment_type, monthCounter, current_day
 	
 				singleRecord = '{ "status" : "' + payment_type + '", "account" : "' + pay_account + '", "currentTitle" : "' + name + ': $' + isNull(amount_due) + '", "currentDate" : "' + isNull(due_date) + '", "currentStatus" : "' + status + '" }' 
 				if(month == 'tbl_December' and numRecords == len(data) - 1):

@@ -1,3 +1,5 @@
+dTableBills = null;
+
 $(document).ready(function (){
 	parameters = JSON.stringify({request:'billInfo'});
 	$.ajax({
@@ -37,7 +39,7 @@ $(document).ready(function (){
 			});
 			$('#currentBills').delegate('.buttonSQ', 'click', function(){
 				submitVariable = $(this).val()
-				parameters = JSON.stringify({request: "delete", data:submitVariable});
+				parameters = JSON.stringify({request: "checkDelete", data:submitVariable});
 				$.ajax({
 					url: 'cgi-bin/command.py',
 					type: 'POST',
@@ -47,25 +49,31 @@ $(document).ready(function (){
 						alert("ERROR:" + jqXHR.responseText);
 					},
 					success: function(data){
-						location.reload();
+						data = $.parseJSON(data);
+						if(confirm("Delete " + data['name'] + "\nAmount:" + data['amount'] ))
+						{
+							parameters = JSON.stringify({request: "delete", data:submitVariable});
+							$.ajax({
+								url: 'cgi-bin/command.py',
+								type: 'POST',
+								data: parameters,
+								dataType: 'text',
+								error: function(jqXHR, error, errorThrown){
+									alert("ERROR:" + jqXHR.responseText);
+								},
+								success: function(data){
+									location.reload();
+								}
+							});
+						}
 					}
 				});
 			});
-			var tbl = $('#currentBills');
-			var obj = $.paramquery.tableToArray(tbl);
-			var newObj = {
-				editModel: { clicksToEdit: 2 },
-				width: 900,
-				flexHeight: true,
-				title: "Current Bills"
-			};
-
-			newObj.dataModel = { data: obj.data, sortIndx: 2, rPP:20, paging: "local" };
-			newObj.colModel = obj.colModel;
-			$.extend(newObj.colModel[0], {flexWidth: 200});
-			$.extend(newObj.colModel[1], {width: 100});
-			$.extend(newObj.colModel[5], {width: 85});
-			var $grid = $('#currentBills').pqGrid(newObj);
+			dTableBills = $('#currentBills').dataTable({
+				"bPaginate": false,
+				"bFilter": false,
+				"aaSorting":[[ 2, "asc"]]
+			});
 			
 
 		}

@@ -1,5 +1,34 @@
+dTableAnalytics = null;
+dTableMonth = null;
+
+function calcDaysInMonth(month)
+{
+	if( month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
+		return 31
+	else if( month == 2 )
+		return 28
+	else
+		return 30  
+}
+
+function calcWeek(firstDay, month)
+{
+	var daysInMonth = calcDaysInMonth(month);
+	var week = parseInt(firstDay)+6;
+	if(week > daysInMonth)
+	{
+		week = week - daysInMonth;
+		month = parseInt(month) + 1;
+		if(month > 12)
+			month = parseInt(month) - 12;
+		return [week, month];
+	}
+	else
+		return [week, month];
+}
 function getBills()
 {
+      parameters = JSON.stringify({request:'queryAll'});
       $.ajax({
 	url: 'cgi-bin/command.py',
 	type: 'POST',
@@ -43,10 +72,75 @@ function getBills()
 	}
       });
 }
-$(document).ready(function() {
-	parameters = JSON.stringify({request:'queryAll'});
+function tables()
+{
+	//Calculate the 6 weeks shown on all the calendars
+	var startDate = $.fullCalendar.formatDate($('#calendar').fullCalendar('getView').visStart, 'M dd');
+	var calArray = new Array(parseInt(startDate.split(" ")[0]), parseInt(startDate.split(" ")[1]));
 
+	for(var i=0; i<6; i++)
+	{
+		dates = calcWeek(calArray[calArray.length-1], calArray[calArray.length - 2]);
+		calArray.push(dates[1]);
+		calArray.push(dates[0]);
+		if(i != 5)
+		{
+			calArray.push(dates[1]);
+			calArray.push(dates[0] + 1);
+		}
+	}
+	parameters = JSON.stringify({request:'6weeks', weeksArray:calArray});
+	$.ajax({
+		url: 'cgi-bin/command.py',
+		type: 'POST',
+		data: parameters,
+		dataType: 'text',
+		error: function(jqXHR, error, errorThrown){
+		    alert("ERROR:" + jqXHR.responseText);
+		},
+		success: function(data){
+			data = $.parseJSON(data);
+			if(dTableAnalytics != null){
+				dTableAnalytics.fnClearTable();
+			}
+			else
+			{
+				dTableAnalytics = $('#analytics').dataTable( {
+					"bPaginate": false,
+					"bSort": false,
+					"bFilter": false,
+					"bInfo": false,
+					"bAutoWidth": true
+				});
+			}
+			dTableAnalytics.fnAddData( [ 
+				[ data['Date1'], data['week1'], data['week1Due'] ],
+				[ data['Date2'], data['week2'], data['week2Due'] ],
+				[ data['Date3'], data['week3'], data['week3Due'] ],
+				[ data['Date4'], data['week4'], data['week4Due'] ],
+				[ data['Date5'], data['week5'], data['week5Due'] ],
+				[ data['Date6'], data['week6'], data['week6Due'] ]
+			]);
+			if(dTableMonth != null)
+				dTableMonth.fnClearTable();
+			else
+			{
+				dTableMonth = $('#month').dataTable( {
+					"bPaginate": false,
+					"bSort": false,
+					"bFilter": false,
+					"bInfo": false
+				});
+			}
+			dTableMonth.fnAddData( [ data['calendarCost'], data['calendarDue'] ] );
+		}
+	});
+
+}
+$(document).ready(function() {
 	$('#calendar').fullCalendar({
+		height: 700,
+		windowResize: false,
 		header: {
 			left: 'prev,next today',
 			center: 'title',
@@ -56,6 +150,7 @@ $(document).ready(function() {
 		viewDisplay: function() {
 			$('#calendar').fullCalendar( 'removeEvents' );
 			getBills();
+			tables();
 		},
 		eventDrop: function(event,dayDelta,minuteDelta,allDay,revertFunc) {
 
@@ -71,7 +166,10 @@ $(document).ready(function() {
 				error: function(jqXHR, error, errorThrown){
 				    alert("ERROR:" + jqXHR.responseText);
 				},
-				success: function(){ }
+				success: function(){ 
+					tables();
+				}
+	
 		    	});
 		},
 		eventClick: function(calEvent, jsEvent, view) {
@@ -86,9 +184,6 @@ $(document).ready(function() {
 			    'type': 'iframe',
 			    'href': 'changeBill.php?bill=' + calEvent.title.split(':')[0] + '&date=' + date + ''
 			});
-
-		
 		}
 	});
-
 });
