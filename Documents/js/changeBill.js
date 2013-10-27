@@ -1,59 +1,44 @@
 $(document).ready(function() {
 	
 	$('#currentMonthButton').click(function(sub){
-		submit = true;
-		//perform some error checking
-		if(!submit)
-			sub.preventDefault();
-		else
-		{
-			sub.preventDefault();
-			parameters = JSON.stringify({stat : $("input:radio[name='billStatus']:checked").val(), request : 'changeBill', bill : $('#bill').val(), amount : $('#amount').val(), month : billDate});
+		sub.preventDefault();
+		parameters = JSON.stringify({stat : $("input:radio[name='billStatus']:checked").val(), request : 'changeBill', bill : $('#bill').val(), amount : $('#amount').val(), month : billDate});
 
-			$.ajax({
-				url: 'cgi-bin/command.py',
-				type: 'POST',
-				data: parameters,
-				dataType: 'text',
-				error: function(jqXHR, error, errorThrown){
-					alert("Error submitting change bill: " + error + errorThrown + jqXHR );
-				},
-				success: function(){
-					parent.$('#calendar').fullCalendar( 'removeEvents' );
-					parent.$.fancybox.close();
-					parent.getBills();
-					parent.tables();
-				}
-			});
-		}
+		$.ajax({
+			url: 'cgi-bin/command.py',
+			type: 'POST',
+			data: parameters,
+			dataType: 'text',
+			error: function(jqXHR, error, errorThrown){
+				alert("Error submitting change bill: " + error + errorThrown + jqXHR );
+			},
+			success: function(){
+				parent.$('#calendar').fullCalendar( 'removeEvents' );
+				parent.$.fancybox.close();
+				parent.getBills();
+				parent.tables();
+			}
+		});
 
 	});
 	$('#futureMonthButton').click(function(sub){
-		submit = true;
-
-		if(!submit)
-			sub.preventDefault();
-		else
-			parameters = JSON.stringify({oldBillName: billName, stat : $("input:radio[name='billStatus']:checked").val(), pay_type : $("input:radio[name='status']:checked").val(), request : 'changeAllBill', bill : $('#bill').val(),  pay_method : $('#pay_method').val(), amount : $('#billAmount').val(), month : billDate, day : $('#day').val()});
-			$.ajax({
-				url: 'cgi-bin/command.py',
-				type: 'POST',
-				data: parameters,
-				dataType: 'text',
-				error: function(jqXHR, error, errorThrown){
-					parent.$('#calendar').fullCalendar( 'removeEvents' );
-					parent.$.fancybox.close();
-					parent.getBills();
-					parent.tables();
-					//alert("Error submitting future change bill");
-				},
-				success: function(){
-					parent.$('#calendar').fullCalendar( 'removeEvents' );
-					parent.$.fancybox.close();
-					parent.getBills();
-					parent.tables();
-				}
-			})
+		sub.preventDefault();
+		pars = JSON.stringify({oldBillName: billName, stat : $("input:radio[name='billStatus']:checked").val(), pay_type : $("input:radio[name='status']:checked").val(), request : 'changeAllBill', bill : $('#bill').val(),  pay_method : $('#pay_method').val(), amount : $('#billAmount').val(), month : billDate, day : $('#day').val()});
+		$.ajax({
+			url: 'cgi-bin/command.py',
+			type: 'POST',
+			data: pars,
+			dataType: 'text',
+			error: function(jqXHR, error, errorThrown){
+				alert("Error submitting future change bill: " + errorThrown);
+			},
+			success: function(){
+				parent.$('#calendar').fullCalendar( 'removeEvents' );
+				parent.$.fancybox.close();
+				parent.getBills();
+				parent.tables();
+			}
+		})
 	});
 	/*$('#editBill').submit(function(sub){
 	});*/
@@ -65,7 +50,7 @@ $(document).ready(function() {
 		data: parameters,
 		dataType: 'text',
 		error: function(jqXHR, error, errorThrown){
-			alert("Error getting accounts");
+			alert("Error getting accounts: changebill");
 		},
 		success: function(data){
 			data = $.parseJSON(data); 
@@ -87,7 +72,7 @@ $(document).ready(function() {
 		data: parameters,
 		dataType: 'text',
 		error: function(jqXHR, error, errorThrown){
-			alert("Error loading page");
+			alert("Error loading page: changebill");
 		},
 		success: function(data){
 			$('#bill').val(billName);

@@ -1,6 +1,6 @@
 $(document).ready(function() {
       	$("#pay_accounts").hide();
-      	$("#months").hide();
+      	$("#monthly").hide();
 
 	$('#newBillButton').click(function(sub){
 		sub.preventDefault();
@@ -30,8 +30,14 @@ $(document).ready(function() {
 		if($("#r_dec").is(':checked'))
 			month_array.push('December');
 		
-
-		parameters = JSON.stringify({request:'addBill', name:$('#name').val(), amount:$('#amount').val(), dueDay:$('#dayOfMonth').val(), pay_type:$("input:radio[name='status']:checked").val(), pay_account:$('#pay_accounts').val(), months:month_array, repeat:$("input:radio[name='repeating']:checked").val()});
+		var payHow = $("input:radio[name='status']:checked").val();
+		var account = '';
+		if( payHow == 'Manual')
+			account == 'None';
+		else
+			account == $('#pay_accounts').val();
+		
+		parameters = JSON.stringify({request:'addBill', name:$('#name').val(), amount:$('#amount').val(), dueDay:$('#dayOfMonth').val(), pay_type:payHow, pay_account:account, months:month_array, repeat:$("input:radio[name='repeating']:checked").val()});
 		$.ajax({
 			url: 'cgi-bin/command.py',
 			type: 'POST',
@@ -77,27 +83,28 @@ $(document).ready(function() {
 		success: function(data){
 			data = $.parseJSON(data);
 			 $.each(data, function(key, value){
-                                $('#pay_accounts').append(
-                                        $('<option></option>')
-                                                .attr("value", value)
-                                                .text(value));
+				if(value != 'None')
+				{
+					$('#pay_accounts').append(
+						$('<option></option>')
+							.attr("value", value)
+							.text(value));
+				}
                         });
                 }
         });
 	$("#r_Auto, #r_Manual").change(function(){
-    		if($(this).val() == 'Manual'){
+    		if($(this).val() == 'Manual')
       			$("#pay_accounts").hide();
-    		}
 		else
       			$("#pay_accounts").show();
 			
 	});
 	$("#r_monthly, #r_custom").change(function(){
-    		if($(this).val() == 'monthly'){
-      			$("#months").hide();
-    		}
+    		if($(this).val() == 'monthly')
+      			$("#monthly").hide();
 		else
-      			$("#months").show();
+      			$("#monthly").show();
 			
 	});
 });
