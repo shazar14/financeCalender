@@ -1,6 +1,6 @@
 $(document).ready(function() {
-
-	$('#button').click(function(sub){
+	
+	$('#currentMonthButton').click(function(sub){
 		submit = true;
 		//perform some error checking
 		if(!submit)
@@ -8,7 +8,7 @@ $(document).ready(function() {
 		else
 		{
 			sub.preventDefault();
-			parameters = JSON.stringify({stat : $("input:radio[name='billStatus']:checked").val(), pay_type : $("input:radio[name='status']:checked").val(), request : 'changeBill', bill : $('#bill').val(),  pay_method : $('#pay_method').val(), amount : $('#amount').val(), month : billDate});
+			parameters = JSON.stringify({stat : $("input:radio[name='billStatus']:checked").val(), request : 'changeBill', bill : $('#bill').val(), amount : $('#amount').val(), month : billDate});
 
 			$.ajax({
 				url: 'cgi-bin/command.py',
@@ -16,7 +16,7 @@ $(document).ready(function() {
 				data: parameters,
 				dataType: 'text',
 				error: function(jqXHR, error, errorThrown){
-					alert("Error submitting change bill");
+					alert("Error submitting change bill: " + error + errorThrown + jqXHR );
 				},
 				success: function(){
 					parent.$('#calendar').fullCalendar( 'removeEvents' );
@@ -28,26 +28,32 @@ $(document).ready(function() {
 		}
 
 	});
-	$('#button2').click(function(sub){
+	$('#futureMonthButton').click(function(sub){
 		submit = true;
 
 		if(!submit)
 			sub.preventDefault();
 		else
-			parameters = JSON.stringify({stat : $("input:radio[name='billStatus']:checked").val(), pay_type : $("input:radio[name='status']:checked").val(), request : 'changeAllBill', bill : $('#bill').val(),  pay_method : $('#pay_method').val(), amount : $('#amount').val(), month : billDate});
-			url: 'cgi-bin/command.py',
-			type: 'POST',
-			data: parameters,
-			dataType: 'text',
-			error: function(jqXHR, error, errorThrown){
-				alert("Error submitting change bill");
-			},
-			success: function(){
-				parent.$('#calendar').fullCalendar( 'removeEvents' );
-				parent.$.fancybox.close();
-				parent.getBills();
-				parent.tables();
-			}
+			parameters = JSON.stringify({oldBillName: billName, stat : $("input:radio[name='billStatus']:checked").val(), pay_type : $("input:radio[name='status']:checked").val(), request : 'changeAllBill', bill : $('#bill').val(),  pay_method : $('#pay_method').val(), amount : $('#billAmount').val(), month : billDate, day : $('#day').val()});
+			$.ajax({
+				url: 'cgi-bin/command.py',
+				type: 'POST',
+				data: parameters,
+				dataType: 'text',
+				error: function(jqXHR, error, errorThrown){
+					parent.$('#calendar').fullCalendar( 'removeEvents' );
+					parent.$.fancybox.close();
+					parent.getBills();
+					parent.tables();
+					//alert("Error submitting future change bill");
+				},
+				success: function(){
+					parent.$('#calendar').fullCalendar( 'removeEvents' );
+					parent.$.fancybox.close();
+					parent.getBills();
+					parent.tables();
+				}
+			})
 	});
 	/*$('#editBill').submit(function(sub){
 	});*/
@@ -72,8 +78,8 @@ $(document).ready(function() {
 		}
 	});
 
-	var billName = $('#billName').val();
-	var billDate = $('#billDate').val();
+	var billName = parent.billName;
+	var billDate = parent.month;;
 	parameters = JSON.stringify({request:'getBill', bill:billName, date:billDate});
 	$.ajax({
 		url: 'cgi-bin/command.py',
@@ -87,7 +93,8 @@ $(document).ready(function() {
 			$('#bill').val(billName);
 			data = $.parseJSON(data);
 			$('#amount').val(data['amount']);
-
+			$('#billAmount').val(data['amount']);
+			$('#day').val(data['day'])
 			//Set the payment type
 			if(data['pay_type'] == 'Automatic')
 			{

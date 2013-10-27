@@ -1,0 +1,39 @@
+<head>
+	<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<script src="js/changeBill.js"></script>
+<style>
+	fieldset {
+  		padding: 1em;
+	  	margin-bottom: 10px;
+	}
+</style>
+</head>
+<body>
+	<form id='editBill'>
+		<fieldset> <legend>Change Future Month Bills</legend>
+			<label for='bill' style="float: left; margin-left: 32%;">Bill:</label><input type='text' name='bill' id='bill' size="40"><br /><br />
+			<label for='billAmount' style="float: left; margin-left: 37%;">Amount:</label><input type='text' name='billAmount' id='billAmount'><br /><br />
+			<div style='float: left; margin-left: 31%'>
+				<input type="radio" value='Automatic' name="status" id="r_Auto">Automatic
+				<input type="radio" value='Manual' name="status" id="r_Manual">Manual
+				<select id='pay_method'></select><br />
+			</div>
+			<br /><br />
+			<label for='day' style="float: left; margin-left: 37%;">Day:</label><input type='text' name='day' id='day'><br /><br />
+			<div style='float: left; margin-left: 41%'>
+				<button id="futureMonthButton">Change All Future Bills</button>
+			</div>
+		</fieldset>
+		<fieldset><legend>Current Month Bill</legend>
+			<label for='amount' style="float: left; margin-left: 37%;">Amount:</label><input type='text' name='amount' id='amount'><br /><br />
+			<div style="float: left; margin-left: 37%; margin-bottom: 10px">
+				<input type="radio" value='Paid' name="billStatus" id="r_Paid">Paid
+				<input type="radio" value='Due' name="billStatus" id="r_Due">Due
+				<input type="radio" value='Skip' name="billStatus" id="r_Skip">Skip<br />
+			</div>
+			<br /><br />
+			<button id="currentMonthButton" style="float: left; margin-left: 42%">Change Current Bill</button>
+		</fieldset>
+	</form>
+</body>

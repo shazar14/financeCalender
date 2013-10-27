@@ -203,36 +203,59 @@ def add_bill(name, amount, dueDay, pay_type, pay_account, months, repeat_options
 
 #endef
 ############################################################
-def change_bill(status, pay_type, bill, pay_account, amount, month):
-	db, cursor = connect_DB()
-	table = "tbl_" + calendar.month_name[int(month)]
-	
-	query = "SELECT id FROM tbl_Bills WHERE name='%s'" % bill 
-	records = cursor.execute(query)
-	if(records == 0 or records > 1):
-		return '{ "valid" : "false"}'
-	else:
-		results = cursor.fetchall()
-		for result in results:
-			query = "UPDATE %s SET status='%s', amount=%.02f WHERE bill_id=%d" % (table, status, decimal.Decimal(amount), result['id'])
-			cursor.execute(query)
-			db.commit()
-	
-#endef
-############################################################
-def change_all_bill(status, pay_type, bill, pay_account, amount, month):
+def change_bill(status, bill, amount, month):
 	db, cursor = connect_DB()
 	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
-
-	query = "SELECT id FROM tbl_Bills WHERE name='%s'" % bill 
+	
+	query = "SELECT * FROM tbl_Bills WHERE name='%s'" % bill 
 	cursor.execute(query)
 	row = cursor.fetchone()
 
-	for i in range(int(month), 12):
-		for result in results:
-			query = "UPDATE %s SET status='%s', amount=%.02f WHERE bill_id=%d" % (table, status, decimal.Decimal(amount), result['id'])
+	query = "UPDATE %s SET status='%s', amount=%.02f WHERE bill_id=%d" % (tables[int(month)-1], status, decimal.Decimal(amount), row['id'])
+	cursor.execute(query)
+	db.commit()
+	return '{ "valid" : "true" }'
+	
+#endef
+############################################################
+def change_all_bill(oldBillName, status, pay_type, bill, pay_account, amount, month, day):
+	db, cursor = connect_DB()
+	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
+
+	query = "SELECT * FROM tbl_Bills WHERE name='%s'" % oldBillName
+	try:
+		cursor.execute(query)
+	except MySQLdb.Error, e:
+		print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+		close_DB(db)
+		sys.exit(1)
+	row = cursor.fetchone()
+
+	query = "SELECT * FROM tbl_Accounts WHERE name='%s'" % pay_account
+	try:
+		cursor.execute(query)
+	except MySQLdb.Error, e:
+		print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+		close_DB(db)
+		sys.exit(1)
+	account = cursor.fetchone()
+	account_index = account['id']
+		
+	query = "UPDATE tbl_Bills SET name='%s', day_of_month=%d, payment_type='%s', account_index=%d, amount_due=%.02f WHERE id=%d" % (bill, int(day), pay_type, account_index, decimal.Decimal(amount), row['id'])
+	cursor.execute(query)
+	db.commit()
+
+	for i in range(int(month)-1, 12):
+		query = "UPDATE %s SET status='%s', amount=%.02f, day_of_month=%d WHERE bill_id=%d" % (tables[i], status, decimal.Decimal(amount), int(day), row['id'])
+		try:
 			cursor.execute(query)
-			db.commit()
+		except MySQLdb.Error, e:
+			print("MySQL Error [%d]: %s {%s}\n\n" %(e.args[0], e.args[1], query))
+			close_DB(db)
+			sys.exit(1)
+	
+		db.commit()
+	return '{ "valid" : "true" }'
 #endef
 ############################################################
 def change_day(dayToChange, title, monthToChange):
@@ -267,11 +290,11 @@ def get_bill(bill, billMonth):
 	else:
 		results = cursor.fetchall()
 		for result in results:
-			query = "SELECT %s.amount, tbl_Bills.payment_type, tbl_Accounts.name, %s.status FROM tbl_Bills INNER JOIN tbl_Accounts ON tbl_Accounts.id=tbl_Bills.account_index INNER JOIN %s ON %s.bill_id=tbl_Bills.id WHERE bill_id=%d" % (table, table, table, table, result['id'])
+			query = "SELECT %s.amount, tbl_Bills.day_of_month, tbl_Bills.payment_type, tbl_Accounts.name, %s.status FROM tbl_Bills INNER JOIN tbl_Accounts ON tbl_Accounts.id=tbl_Bills.account_index INNER JOIN %s ON %s.bill_id=tbl_Bills.id WHERE bill_id=%d" % (table, table, table, table, result['id'])
 			cursor.execute( query )
 			bills = cursor.fetchall()
 			for bill in bills:
-				jsonResponse = jsonResponse + '"amount" : "' + isNull(bill['amount']) + '", "pay_type" : "' + bill['payment_type'] + '", "account": "' + bill['name'] + '", "status" : "' + bill['status'] + '"'	 
+				jsonResponse = jsonResponse + '"day" : "' + isNull(bill['day_of_month']) + '", "amount" : "' + isNull(bill['amount']) + '", "pay_type" : "' + bill['payment_type'] + '", "account": "' + bill['name'] + '", "status" : "' + bill['status'] + '"'	 
 			return jsonResponse + ' }'
 #endef
 ############################################################
@@ -290,7 +313,7 @@ def get_accounts():
 	jsonResponse = '{'
 	counter = 0
 
-	query = "SELECT name FROM `tbl_Accounts` WHERE name!='None'"
+	query = "SELECT name FROM `tbl_Accounts`"
 	cursor.execute( query )
 	results = cursor.fetchall()
 	for result in results:
@@ -302,6 +325,23 @@ def get_accounts():
 	return jsonResponse
 			
 
+#endef
+############################################################
+def get_months(startMonth):
+	db, cursor = connect_DB()
+	tables = ['tbl_January', 'tbl_February', 'tbl_March', 'tbl_April', 'tbl_May', 'tbl_June', 'tbl_July', 'tbl_August', 'tbl_September', 'tbl_October', 'tbl_November', 'tbl_December']
+	month = 1
+	jsonResponse = '{'
+
+	for i in range(int(startMonth), int(startMonth) + 3):
+		query = "SELECT SUM(amount) AS sum FROM %s" % tables[i-1]
+		cursor.execute( query )
+		data = cursor.fetchall()
+		jsonResponse = jsonResponse + ' "month' + str(month) + '": "' + calendar.month_name[int(i)] + '", "month' + str(month) + 'Total": "' + str(decimal.Decimal(data[0]['sum'])) + '", '
+		month = month + 1
+
+	return(jsonResponse[:-2] + ' }')
+		
 #endef
 ############################################################
 def weeks(weeks):

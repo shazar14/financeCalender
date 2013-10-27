@@ -1,5 +1,9 @@
 dTableAnalytics = null;
 dTableMonth = null;
+dTableMonths = null;
+
+month = 0;
+billName = '';
 
 function calcDaysInMonth(month)
 {
@@ -89,6 +93,37 @@ function tables()
 			calArray.push(dates[0] + 1);
 		}
 	}
+	parameters = JSON.stringify({request:'getMonths', startMonth:startDate.split(" ")[0]});
+	$.ajax({
+		url: 'cgi-bin/command.py',
+		type: 'POST',
+		data: parameters,
+		dataType: 'text',
+		error: function(jqXHR, error, errorThrown){
+		    alert("ERROR:" + jqXHR.responseText);
+		},
+		success: function(data){
+			data = $.parseJSON(data);
+			if(dTableMonths != null)
+				dTableMonths.fnClearTable();
+			else
+			{
+				dTableMonths = $('#months').dataTable( {
+					"bPaginate": false,
+					"bSort": false,
+					"bFilter": false,
+					"bInfo": false,
+					"bAutoWidth":true
+				});
+			}
+			dTableMonths.fnAddData( [
+				[ data['month1'], data['month1Total'] ],
+				[ data['month2'], data['month2Total'] ],
+				[ data['month3'], data['month3Total'] ]
+			]);
+		}
+	});
+
 	parameters = JSON.stringify({request:'6weeks', weeksArray:calArray});
 	$.ajax({
 		url: 'cgi-bin/command.py',
@@ -174,7 +209,8 @@ $(document).ready(function() {
 		},
 		eventClick: function(calEvent, jsEvent, view) {
 
-			var date = $.fullCalendar.formatDate( calEvent.start, "M");
+			month = $.fullCalendar.formatDate( calEvent.start, "M");
+			billName = calEvent.title.split(':')[0]
 			$.fancybox({
 			    'width': '40%',
 			    'height': '40%',
@@ -182,7 +218,8 @@ $(document).ready(function() {
 			    'transitionIn': 'fade',
 			    'transitionOut': 'fade',
 			    'type': 'iframe',
-			    'href': 'changeBill.php?bill=' + calEvent.title.split(':')[0] + '&date=' + date + ''
+			   // 'href': 'changeBill.php?bill=' + calEvent.title.split(':')[0] + '&date=' + date + ''
+			    'href': 'changeBill.html'
 			});
 		}
 	});
