@@ -10,6 +10,7 @@ import decimal
 def connect_DB():
 #	db = MySQLdb.connect("localhost","otis","toor","finances2" )
 #	db = MySQLdb.connect("localhost","root","toor","finances" )
+
 	db = MySQLdb.connect("localhost","root","toor","newFinances" )
 	
 	cursor = db.cursor(MySQLdb.cursors.DictCursor)
