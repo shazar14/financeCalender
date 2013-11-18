@@ -44,7 +44,7 @@ elif(jsonData['request'] == 'checkDelete'):
 elif(jsonData['request'] == '6weeks'):
 	jsonResults = db_interact.weeks(jsonData['weeksArray'])
 elif(jsonData['request'] == 'getMonths'):
-	jsonResults = db_interact.get_months(jsonData['startMonth'])
+	jsonResults = db_interact.get_months(jsonData['startMonth'], jsonData['year'])
 else:
 	jsonResults = '{ "valid" : "no command recognized" }'
 

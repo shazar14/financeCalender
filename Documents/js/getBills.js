@@ -15,20 +15,24 @@ function calcDaysInMonth(month)
 		return 30  
 }
 
-function calcWeek(firstDay, month)
+function calcWeek(firstDay, month, year)
 {
 	var daysInMonth = calcDaysInMonth(month);
 	var week = parseInt(firstDay)+6;
+	var newYear = parseInt(year);
 	if(week > daysInMonth)
 	{
 		week = week - daysInMonth;
 		month = parseInt(month) + 1;
 		if(month > 12)
+		{
 			month = parseInt(month) - 12;
-		return [week, month];
+			newYear = newYear + 1;
+		}
+		return [week, month, newYear];
 	}
 	else
-		return [week, month];
+		return [week, month, newYear];
 }
 function getBills()
 {
@@ -79,21 +83,39 @@ function getBills()
 function tables()
 {
 	//Calculate the 6 weeks shown on all the calendars
-	var startDate = $.fullCalendar.formatDate($('#calendar').fullCalendar('getView').visStart, 'M dd');
-	var calArray = new Array(parseInt(startDate.split(" ")[0]), parseInt(startDate.split(" ")[1]));
+	var startDate = $.fullCalendar.formatDate($('#calendar').fullCalendar('getView').visStart, 'M dd yyyy');
+	var calArray = new Array(parseInt(startDate.split(" ")[0]), parseInt(startDate.split(" ")[1]), parseInt(startDate.split(" ")[2]));
 
 	for(var i=0; i<6; i++)
 	{
-		dates = calcWeek(calArray[calArray.length-1], calArray[calArray.length - 2]);
-		calArray.push(dates[1]);
-		calArray.push(dates[0]);
+		//debugger;
+		dates = calcWeek(calArray[calArray.length-2], calArray[calArray.length - 3], calArray[calArray.length - 1]);
+		calArray.push(dates[1]); //month
+		calArray.push(dates[0]); //day
+		calArray.push(dates[2]); //year
 		if(i != 5)
 		{
-			calArray.push(dates[1]);
-			calArray.push(dates[0] + 1);
+			if((dates[0] + 1) > calcDaysInMonth(dates[1]))
+			{
+				if(dates[1] == 12)
+					calArray.push(1);
+				else
+					calArray.push(dates[1] + 1);
+				calArray.push(1);
+				if(dates[1] == 12)
+					calArray.push(dates[2] + 1);
+				else
+					calArray.push(dates[2]);
+			}
+			else
+			{
+				calArray.push(dates[1]);
+				calArray.push(dates[0] + 1);
+				calArray.push(dates[2]);
+			}
 		}
 	}
-	parameters = JSON.stringify({request:'getMonths', startMonth:startDate.split(" ")[0]});
+	parameters = JSON.stringify({request:'getMonths', startMonth:startDate.split(" ")[0], year:$('#calendar').fullCalendar('getView').title.split(" ")[1]});
 	$.ajax({
 		url: 'cgi-bin/command.py',
 		type: 'POST',

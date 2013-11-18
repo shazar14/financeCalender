@@ -6,36 +6,36 @@ $(document).ready(function() {
 		sub.preventDefault();
 		var month_array = new Array();
 		if($("#r_jan").is(':checked'))
-			month_array.push('January');
+			month_array.push('1');
 		if($("#r_feb").is(':checked'))
-			month_array.push('February');
+			month_array.push('2');
 		if($("#r_march").is(':checked'))
-			month_array.push('March');
+			month_array.push('3');
 		if($("#r_april").is(':checked'))
-			month_array.push('April');
+			month_array.push('4');
 		if($("#r_may").is(':checked'))
-			month_array.push('May');
+			month_array.push('5');
 		if($("#r_jun").is(':checked'))
-			month_array.push('June');
+			month_array.push('6');
 		if($("#r_jul").is(':checked'))
-			month_array.push('July');
+			month_array.push('7');
 		if($("#r_aug").is(':checked'))
-			month_array.push('August');
+			month_array.push('8');
 		if($("#r_sept").is(':checked'))
-			month_array.push('September');
+			month_array.push('9');
 		if($("#r_oct").is(':checked'))
-			month_array.push('October');
+			month_array.push('10');
 		if($("#r_nov").is(':checked'))
-			month_array.push('November');
+			month_array.push('11');
 		if($("#r_dec").is(':checked'))
-			month_array.push('December');
-		
+			month_array.push('12');
+
 		var payHow = $("input:radio[name='status']:checked").val();
 		var account = '';
 		if( payHow == 'Manual')
-			account == 'None';
+			account = 'None';
 		else
-			account == $('#pay_accounts').val();
+			account = $('#pay_accounts').val();
 		
 		parameters = JSON.stringify({request:'addBill', name:$('#name').val(), amount:$('#amount').val(), dueDay:$('#dayOfMonth').val(), pay_type:payHow, pay_account:account, months:month_array, repeat:$("input:radio[name='repeating']:checked").val()});
 		$.ajax({
