@@ -20,11 +20,11 @@ except ValueError:
   sys.exit()
 
 if(jsonData['request'] == 'queryAll'):
-	jsonResults = db_interact.get_all_bills()
+	jsonResults = db_interact.get_all_bills(jsonData['start'], jsonData['end'])
 elif(jsonData['request'] == 'billInfo'):
 	jsonResults = db_interact.list_bills()
 elif(jsonData['request'] == 'changeDay'):
-	jsonResults = db_interact.change_day(jsonData['dayToChange'], jsonData['title'], jsonData['month'])
+	jsonResults = db_interact.change_day(jsonData['oldDate'], jsonData['title'], jsonData['newDate'])
 elif(jsonData['request'] == 'getBill'):
 	jsonResults = db_interact.get_bill(jsonData['bill'], jsonData['date'])
 elif(jsonData['request'] == 'getAccounts'):

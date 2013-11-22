@@ -32,7 +32,7 @@ $(document).ready(function (){
 					'<td>' + value['dayofmonth'] + '</td>' +
 					'<td>' + value['paymentType'] + '</td>' +
 					'<td>' + value['account'] + '</td>' +
-					'<td><button class="buttonSQ" value="' +  value['id'] + '">Delete</button></td>'
+					'<td><button class="buttonSQ" value="' +  value['name'] + '">Delete</button></td>'
 					'</tr>';
 					$('#currentBills').append(row);
 				});

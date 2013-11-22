@@ -2,7 +2,7 @@ dTableAnalytics = null;
 dTableMonth = null;
 dTableMonths = null;
 
-month = 0;
+eventDate = '';
 billName = '';
 
 function calcDaysInMonth(month)
@@ -36,7 +36,9 @@ function calcWeek(firstDay, month, year)
 }
 function getBills()
 {
-      parameters = JSON.stringify({request:'queryAll'});
+      var startDate = $.fullCalendar.formatDate($('#calendar').fullCalendar('getView').visStart, 'yyyy-MM-dd');
+      var endDate = $.fullCalendar.formatDate($('#calendar').fullCalendar('getView').visEnd, 'yyyy-MM-dd');
+      parameters = JSON.stringify({request:'queryAll', start:startDate, end:endDate});
       $.ajax({
 	url: 'cgi-bin/command.py',
 	type: 'POST',
@@ -115,7 +117,7 @@ function tables()
 			}
 		}
 	}
-	parameters = JSON.stringify({request:'getMonths', startMonth:startDate.split(" ")[0], year:$('#calendar').fullCalendar('getView').title.split(" ")[1]});
+	parameters = JSON.stringify({request:'getMonths', startMonth:$('#calendar').fullCalendar('getView').title.split(" ")[0], year:$('#calendar').fullCalendar('getView').title.split(" ")[1]});
 	$.ajax({
 		url: 'cgi-bin/command.py',
 		type: 'POST',
@@ -195,6 +197,7 @@ function tables()
 
 }
 $(document).ready(function() {
+	var eventStartDate='';
 	$('#calendar').fullCalendar({
 		height: 700,
 		windowResize: false,
@@ -209,12 +212,14 @@ $(document).ready(function() {
 			getBills();
 			tables();
 		},
+		eventDragStart: function( event, jsEvent, ui, view ) { 
+			eventStartDate = $.fullCalendar.formatDate(event.start, "yyyy-MM-dd");
+		},
 		eventDrop: function(event,dayDelta,minuteDelta,allDay,revertFunc) {
 
-			var monthToChange = $.fullCalendar.formatDate( event.start, "M");
-			var dayToChange = $.fullCalendar.formatDate( event.start, "d");
+			var newDate = $.fullCalendar.formatDate( event.start, "yyyy-MM-dd" );
 
-			parameters = JSON.stringify({"request":"changeDay", "dayToChange":dayToChange, "month":monthToChange,"title":event.title}); 
+			parameters = JSON.stringify({"request":"changeDay", "oldDate":eventStartDate, "newDate":newDate,"title":event.title}); 
 			$.ajax({
 				url: 'cgi-bin/command.py',
 				type: 'POST',
@@ -226,12 +231,11 @@ $(document).ready(function() {
 				success: function(){ 
 					tables();
 				}
-	
 		    	});
 		},
 		eventClick: function(calEvent, jsEvent, view) {
 
-			month = $.fullCalendar.formatDate( calEvent.start, "M");
+			eventDate = $.fullCalendar.formatDate(calEvent.start, 'yyyy-MM-dd');
 			billName = calEvent.title.split(':')[0]
 			$.fancybox({
 			    'width': '40%',
@@ -240,7 +244,6 @@ $(document).ready(function() {
 			    'transitionIn': 'fade',
 			    'transitionOut': 'fade',
 			    'type': 'iframe',
-			   // 'href': 'changeBill.php?bill=' + calEvent.title.split(':')[0] + '&date=' + date + ''
 			    'href': 'changeBill.html'
 			});
 		}

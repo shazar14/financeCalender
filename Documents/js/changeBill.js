@@ -64,8 +64,8 @@ $(document).ready(function() {
 	});
 
 	var billName = parent.billName;
-	var billDate = parent.month;;
-	parameters = JSON.stringify({request:'getBill', bill:billName, date:billDate});
+	var billDate = parent.eventDate;
+	parameters = JSON.stringify({request:'getBill', bill:billName, date:parent.eventDate});
 	$.ajax({
 		url: 'cgi-bin/command.py',
 		type: 'POST',
@@ -79,7 +79,7 @@ $(document).ready(function() {
 			data = $.parseJSON(data);
 			$('#amount').val(data['amount']);
 			$('#billAmount').val(data['amount']);
-			$('#day').val(data['day'])
+			$('#day').val(data['day'].split("-")[2])
 			//Set the payment type
 			if(data['pay_type'] == 'Automatic')
 			{
