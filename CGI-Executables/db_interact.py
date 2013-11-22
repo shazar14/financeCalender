@@ -115,7 +115,7 @@ def add_bill(name, amount, dueDay, pay_type, pay_account, months, repeat_options
 		
 	if repeat_options == 'monthly':
 		#calculate if the bill should start this month
-		if( dueDay >= currentDay):
+		if( int(dueDay) >= currentDay):
 			date = datetime.date(currentYear, currentMonth, int(dueDay)) 
 		else:
 			if(currentMonth == 12):

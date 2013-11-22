@@ -36,7 +36,7 @@ $(document).ready(function() {
 			account = 'None';
 		else
 			account = $('#pay_accounts').val();
-		
+		debugger;		
 		parameters = JSON.stringify({request:'addBill', name:$('#name').val(), amount:$('#amount').val(), dueDay:$('#dayOfMonth').val(), pay_type:payHow, pay_account:account, months:month_array, repeat:$("input:radio[name='repeating']:checked").val()});
 		$.ajax({
 			url: 'cgi-bin/command.py',
